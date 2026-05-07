@@ -143,6 +143,7 @@ export const DetailedQuestionnaire: React.FC<{ company?: string }> = ({ company 
     coolingWaterPressure: { value: '', unit: 'bar' },
     vocRecovery:          { value: '', unit: '%' },
     noiseLevel:           { value: '', unit: 'dBA @ 1m' },
+    loadingPumpFlowRate:  { value: '', unit: 'm³/h' },
   });
 
   const ui = (id: string) => ({
@@ -440,6 +441,11 @@ export const DetailedQuestionnaire: React.FC<{ company?: string }> = ({ company 
                   <span style={{ fontSize: "0.8rem", color: "#6B7280" }}>{t.truckDay}</span>
                 </div>
               </div>
+            </QuestionnaireField>
+            <UnitInputField id="loadingPumpFlowRate" label={t.loadingPumpFlowRate} description={t.loadingPumpFlowRateDesc}
+              units={['m³/h', 'LPM', 'GPM', 'BPH']} placeholder={t.ph_loadingPumpFlowRate} {...ui('loadingPumpFlowRate')} />
+            <QuestionnaireField label={t.simultaneousTrucks} description={t.simultaneousTrucksDesc}>
+              <input id="simultaneousTrucks" type="number" step="1" placeholder={t.ph_simultaneousTrucks} />
             </QuestionnaireField>
             <UnitInputField id="dischargePressure" label={t.dischargePressure} description={t.dischargePressureDesc}
               units={['bar', 'psig', 'kPa']} placeholder={t.ph_dischargePressure} {...ui('dischargePressure')} />
