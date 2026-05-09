@@ -195,8 +195,10 @@ export const DetailedQuestionnaire: React.FC<{ company?: string }> = ({ company 
     const siteCountry = (document.getElementById('siteCountry') as HTMLInputElement)?.value || '';
     const siteLocation = [siteCity, siteCountry].filter(Boolean).join(', ') || 'Not Specified';
     const contactPerson = (document.getElementById('contactPerson') as HTMLInputElement)?.value || 'Not Specified';
-    const generationDate = new Date().toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const generationDateZh = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+    const generationDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+    // For Chinese: use simple numeric format to avoid font encoding issues in html2canvas
+    const now = new Date();
+    const generationDateZh = `${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日`;
     const disclaimer = 'This report is a preliminary assessment based on the data provided. It is for discussion purposes only and should not be considered a final engineering specification. A qualified engineer must be consulted for detailed design.';
 
     if (company === 'kosman') {
@@ -237,6 +239,33 @@ export const DetailedQuestionnaire: React.FC<{ company?: string }> = ({ company 
       `;
       document.body.appendChild(cover);
       const coverCanvas = await (window as any).html2canvas(cover, { scale: 2 });
+      document.body.removeChild(cover);
+      pdf.addImage(coverCanvas.toDataURL('image/png'), 'PNG', 0, 0, W, H);
+    } else if (company === 'autower') {
+      // Autower cover — logo from URL + orange/blue scheme
+      const autowerLogoUrl = 'https://www.autoware-group.com/uploads/202030878/logo202011131203306290370.png';
+      const cover = document.createElement('div');
+      cover.style.cssText = 'position:absolute;left:-9999px;width:210mm;height:297mm;background:white;font-family:sans-serif;display:flex;flex-direction:column;';
+      cover.innerHTML = `
+        <div style="background-color:#1B3A6B;height:8mm;width:100%;"></div>
+        <div style="padding:15mm 20mm 10mm;display:flex;align-items:center;border-bottom:3px solid #F47920;">
+          <img src="${autowerLogoUrl}" style="height:20mm;width:auto;" crossorigin="anonymous" />
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding-top:20mm;color:#1a202c;">
+          <h1 style="font-size:24pt;font-weight:bold;margin-bottom:4mm;color:#1B3A6B;">VRU Specification Report</h1>
+          <p style="font-size:14pt;color:#F47920;font-weight:600;">Preliminary Assessment</p>
+          <div style="margin-top:30mm;width:100%;padding:0 20mm;font-size:12pt;color:#2D3748;">
+            <div style="display:grid;grid-template-columns:40mm 1fr;gap:10mm;margin-bottom:8mm;"><span style="font-weight:bold;">Project:</span><span>${projectName}</span></div>
+            <div style="display:grid;grid-template-columns:40mm 1fr;gap:10mm;margin-bottom:8mm;"><span style="font-weight:bold;">Site:</span><span>${siteLocation}</span></div>
+            <div style="display:grid;grid-template-columns:40mm 1fr;gap:10mm;margin-bottom:8mm;"><span style="font-weight:bold;">Contact:</span><span>${contactPerson}</span></div>
+            <div style="display:grid;grid-template-columns:40mm 1fr;gap:10mm;margin-bottom:8mm;"><span style="font-weight:bold;">Date:</span><span>${generationDate}</span></div>
+          </div>
+        </div>
+        <div style="padding:10mm 20mm;font-size:9pt;color:#6B7280;line-height:1.5;border-top:1px solid #E5E7EB;">${disclaimer}</div>
+        <div style="background-color:#F47920;height:4mm;width:100%;"></div>
+      `;
+      document.body.appendChild(cover);
+      const coverCanvas = await (window as any).html2canvas(cover, { scale: 2, useCORS: true });
       document.body.removeChild(cover);
       pdf.addImage(coverCanvas.toDataURL('image/png'), 'PNG', 0, 0, W, H);
     } else {
@@ -375,7 +404,7 @@ export const DetailedQuestionnaire: React.FC<{ company?: string }> = ({ company 
         pdf.text('CEO: Mr. Yalçin Aliyev', m, H - 12);
         pdf.text('Phone: +994 55 320 42 81', m, H - 8);
       }
-      const companyName = company === 'kosman' ? 'Kosman' : 'Sevali Energy';
+      const companyName = company === 'kosman' ? 'Kosman' : company === 'autower' ? 'Autower' : 'Sevali Energy';
       pdf.text(`© ${new Date().getFullYear()} ${companyName}. All rights reserved.`, W - m, H - 12, { align: 'right' });
       pdf.text('For official use, consult a qualified engineer.', W - m, H - 8, { align: 'right' });
     }

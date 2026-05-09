@@ -3,10 +3,10 @@ import { DetailedQuestionnaire } from './components/DetailedQuestionnaire';
 import { useLang } from './LanguageContext';
 import { type Language } from './i18n';
 
-type Company = 'sevali' | 'kosman' | 'custom';
+type Company = 'sevali' | 'kosman' | 'autower' | 'custom';
 
 // Brand is set at build time via VITE_BRAND env variable.
-// In Vercel: set VITE_BRAND=sevali or VITE_BRAND=kosman in project environment variables.
+// In Vercel: set VITE_BRAND=sevali, VITE_BRAND=kosman, or VITE_BRAND=autower
 // Locally: set VITE_BRAND in .env.local
 const BRAND = ((import.meta as any).env.VITE_BRAND as Company) || 'sevali';
 
@@ -14,6 +14,7 @@ const BRAND = ((import.meta as any).env.VITE_BRAND as Company) || 'sevali';
 export const BRAND_COLOR: Record<Company, { accent: string; accentText: string }> = {
   sevali:  { accent: '#F5D781', accentText: '#1a1a1a' },
   kosman:  { accent: '#1a4fa0', accentText: '#FFFFFF' },
+  autower: { accent: '#F47920', accentText: '#FFFFFF' },
   custom:  { accent: '#F5D781', accentText: '#1a1a1a' },
 };
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
   const logos: Record<Company, string> = {
     sevali: 'https://i.ibb.co/Zpx00M2n/sevalitransparentlogo.png',
     kosman: '',
+    autower: 'https://www.autoware-group.com/uploads/202030878/logo202011131203306290370.png',
     custom: '',
   };
 
@@ -74,10 +76,11 @@ const App: React.FC = () => {
                   <div className="text-white text-sm tracking-wide">科仕曼环境科技</div>
                 </div>
               </div>
+            ) : company === 'autower' ? (
+              <img src={logos.autower} alt="Autower" style={{ height: '3.5rem', width: 'auto' }} />
             ) : (
               <img src={logos.sevali} alt="Sevali Energy" style={{ height: '4rem', width: 'auto' }} />
-            )}
-          </div>
+            )}          </div>
 
           {/* Controls */}
           <div className="flex items-center gap-3">
@@ -100,7 +103,11 @@ const App: React.FC = () => {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DetailedQuestionnaire company={company} />
         <footer className="text-center mt-10 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          <p>&copy; {new Date().getFullYear()} {company === 'sevali' ? 'Sevali Energy' : 'Kosman'}. {t.allRightsReserved}</p>
+          <p>&copy; {new Date().getFullYear()} {
+            company === 'kosman' ? 'Kosman' :
+            company === 'autower' ? 'Autower' :
+            'Sevali Energy'
+          }. {t.allRightsReserved}</p>
           <p className="mt-1">{t.consultEngineer}</p>
         </footer>
       </main>
